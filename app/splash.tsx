@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
-import { router } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const splashScreens = [
   {
-    icon: 'storefront-outline',
-    title: 'eVend',
-    subtitle: 'Your quick stop for refreshing drinks.',
-    description: 'Select your favorite drink from the menu.',
+    icon: "cart-outline",
+    title: "eVend",
+    subtitle: "Your quick stop for refreshing drinks.",
+    description: "Select your favorite drink from the menu.",
   },
   {
-    icon: 'card-outline',
-    title: 'eVend',
-    subtitle: 'Your quick stop for refreshing drinks.',
-    description: 'Pay easily using your wallet or card.',
+    icon: "card-outline",
+    title: "eVend",
+    subtitle: "Your quick stop for refreshing drinks.",
+    description: "Pay easily using your wallet or card.",
   },
   {
-    icon: 'checkmark-circle-outline',
-    title: 'eVend',
-    subtitle: 'Your quick stop for refreshing drinks.',
-    description: 'Get an OTP to dispense your drink instantly!',
+    icon: "checkmark-circle-outline",
+    title: "eVend",
+    subtitle: "Your quick stop for refreshing drinks.",
+    description: "Get an OTP to dispense your drink instantly!",
   },
 ];
 
@@ -31,19 +31,14 @@ export default function SplashScreen() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentScreen((prev) => {
-        if (prev < splashScreens.length - 1) {
-          return prev + 1;
-        }
-        return prev;
-      });
+      setCurrentScreen((prev) => (prev + 1) % splashScreens.length);
     }, 3000);
 
     return () => clearInterval(timer);
   }, []);
 
   const handleGetStarted = () => {
-    router.push('/login');
+    router.push("/login");
   };
 
   const currentData = splashScreens[currentScreen];
@@ -61,15 +56,11 @@ export default function SplashScreen() {
 
         {/* Icon */}
         <View className="mb-16">
-          <Ionicons 
-            name={currentData.icon as any} 
-            size={120} 
-            color="white" 
-          />
+          <Ionicons name={currentData.icon as any} size={120} color="white" />
         </View>
 
         {/* Description */}
-        <Text className="text-white text-xl text-center font-medium mb-16 px-4">
+        <Text className="text-white text-xl text-center font-extrabold mb-16 px-4">
           {currentData.description}
         </Text>
       </View>
@@ -82,7 +73,7 @@ export default function SplashScreen() {
             <View
               key={index}
               className={`w-3 h-3 rounded-full mx-1 ${
-                index === currentScreen ? 'bg-white' : 'bg-white/40'
+                index === currentScreen ? "bg-white" : "bg-white/40"
               }`}
             />
           ))}
