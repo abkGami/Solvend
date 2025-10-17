@@ -1,7 +1,12 @@
+import { useWallet } from "@/context/WalletContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const PRESET_AMOUNTS = [
@@ -15,15 +20,23 @@ const PRESET_AMOUNTS = [
 
 export default function TopUpScreen() {
   const [amount, setAmount] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { addFunds } = useWallet();
+  const scale = useSharedValue(1);
+
+  const animatedButtonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const handleAmountSelect = (value: number) => {
     setAmount(value);
   };
 
   const handleTopUp = () => {
-    // Handle top up logic here
-    console.log('Processing top up for:', amount);
-    router.back();
+    if (amount > 0) {
+      addFunds(amount, "Wallet Top-up");
+      router.back();
+    }
   };
 
   return (
@@ -39,7 +52,9 @@ export default function TopUpScreen() {
         <View className="bg-white rounded-2xl p-6 shadow-sm">
           <View className="flex-row items-center mb-6">
             <Ionicons name="wallet-outline" size={24} color="#4DB6AC" />
-            <Text className="text-gray-800 text-lg font-medium ml-2">Enter Amount</Text>
+            <Text className="text-gray-800 text-lg font-medium ml-2">
+              Enter Amount
+            </Text>
           </View>
 
           <View className="bg-gray-50 rounded-xl p-4 mb-6">
@@ -53,11 +68,15 @@ export default function TopUpScreen() {
             {PRESET_AMOUNTS.map((preset) => (
               <TouchableOpacity
                 key={preset.value}
-                className={`w-[31%] rounded-xl py-3 mb-4 ${amount === preset.value ? 'bg-teal-500' : 'bg-gray-100'}`}
+                className={`w-[31%] rounded-xl py-3 mb-4 ${
+                  amount === preset.value ? "bg-teal-500" : "bg-gray-100"
+                }`}
                 onPress={() => handleAmountSelect(preset.value)}
               >
                 <Text
-                  className={`text-center font-medium ${amount === preset.value ? 'text-white' : 'text-gray-800'}`}
+                  className={`text-center font-medium ${
+                    amount === preset.value ? "text-white" : "text-gray-800"
+                  }`}
                 >
                   {preset.label}
                 </Text>
@@ -65,15 +84,23 @@ export default function TopUpScreen() {
             ))}
           </View>
 
-          <TouchableOpacity
-            className={`w-full rounded-xl py-4 mt-4 ${amount > 0 ? 'bg-teal-500' : 'bg-gray-200'}`}
-            onPress={handleTopUp}
-            disabled={amount === 0}
-          >
-            <Text className={`text-center font-medium ${amount > 0 ? 'text-white' : 'text-gray-400'}`}>
-              Top Up
-            </Text>
-          </TouchableOpacity>
+          <Animated.View style={animatedButtonStyle}>
+            <TouchableOpacity
+              className={`w-full rounded-xl py-4 mt-4 ${
+                amount > 0 && !isProcessing ? "bg-teal-500" : "bg-gray-200"
+              }`}
+              onPress={handleTopUp}
+              disabled={amount === 0 || isProcessing}
+            >
+              <Text
+                className={`text-center font-medium ${
+                  amount > 0 && !isProcessing ? "text-white" : "text-gray-400"
+                }`}
+              >
+                {isProcessing ? "Processing..." : "Top Up"}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
         </View>
       </View>
     </SafeAreaView>
